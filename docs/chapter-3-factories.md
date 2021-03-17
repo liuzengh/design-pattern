@@ -58,7 +58,7 @@ Point(float a, float b, PointType type = PointType::cartesian)
 }
 ```
 
-注意构造函数的前两个参数的名称被为了a和b， 我们无法告诉用户a和b的值应该来自哪个坐标系。与使用x、y、rho和theta这种清晰的名称来传达构造意图相比，这显然是一种表现力的丧失。
+注意构造函数的前两个参数的名称被为了a和b， 我们无法告诉用户a和b的值应该来自哪个坐标系。与使用x、y、rho和theta这种清晰的名称来传达构造意图相比，这显然缺乏表现力。
 
 总之，我们的构造函数的设计在功能上是可用的，但是在形式上是丑陋的。接下来让我们看看能否在此基础上改进。
 
@@ -101,7 +101,7 @@ auto = Point::NewPloar(5, M_PI_4)
 
 #### 工厂
 
-就和[:FIXME]Builder模式一样，我们可以把Point类中所有的构建方法都从Point类中提取出来放置到单独一个类中，我么称之为该类为**工厂**。首先我么重新定义Point类：
+就和建造者模式(Builder Pattern)一样，我们可以把Point类中所有的构建方法都从Point类中提取出来放置到单独一个类中，我么称之为该类为**工厂**。首先我么重新定义Point类：
 
 ```c++
 struct Point
@@ -190,3 +190,156 @@ Point::PointFactory::NewXxx(...)
 
 
 是否使用内部工厂很大程度上取决于个人组织代码风格。 然而，从原始对象公开工厂极大地提高了API的可用性。[:FIXME]如果我发现一个名为Point的类和一个私有构造函数，我如何能够知道这个类是要被使用的?除非Person::在代码完成列表中给我一些有意义的东西，否则我不会这么做。
+
+
+#### 抽象工厂
+
+目前为止，我们一直在研究单个对象的构造。有时，你可能会涉及到一系列对象的构造。在实际中这种情况是非常少见的，同工厂方法和简单陈旧的工厂模式相比，抽象工厂模式只会出现在复杂的系统中。不管怎样，主要是由于历史的原因，我们都需要讨论它。
+
+下面是一个简单的场景：假设你在一家只提供咖啡和茶的咖啡店里面工作。这两种热饮是通过完全不同的设备制成，我们可以把它们都建模成一个工厂。茶和饮料事实上可以分为热(hot)饮和冷(cold)饮，但是这里我们只关注热饮。首先我们把HotDrink定义成：
+
+```c++
+struct HotDrink
+{
+    virtual void prepare(int volume) = 0;
+}
+```
+
+prepare函数的功能就是提供一定量(volume)的热饮。例如，对于茶这种类型的热饮，可以实现成这样：
+
+```c++
+struct Tea: HotDrink
+{
+    void prepare(int volume) override
+    {
+        cout << "Take tea bag, boil water, pour " 
+             << volume 
+             << "ml, add some lemon" << endl;
+    }
+};
+```
+
+对于咖啡类型的是实现也是相似的。现在，我们可以编写一个假想的make_drink函数，该函数通过饮料的名字来制作对应的饮料。给出一系列不同的类型，这看起来相当乏味：
+
+```c++
+unique_ptr<HotDrink> make_drink(string type)
+{
+    unique_ptr<HotDrink> drink;
+    if(type == "tea")
+    {
+        drink = make_unique<Tea>();
+        drink->prepare(200);
+    }
+    else
+    {
+        drink = make_unique<Coffee>();
+        drink->prepare(50);
+    }
+    return drink;
+}
+```
+
+现在请记住，不同的饮料是由不同的机器制造的。在我们的例子中，我们只对热饮感兴趣，我们可以构造一个HotDrinkfactory类来建模:
+
+```c++
+struct HotDrinkFactory
+{
+    virtual unique_ptr<HotDrink> make() const = 0;
+};
+```
+
+这种类型恰好是一个抽象工厂（Abstract Factory）:它是有特定接口的一个工厂，但是它是抽象的，[FIXME]这意味着它只能作为函数参数， 例如，我们需要具体的实现来实际制作饮料。例如想要制作咖啡，我们可以写成：
+
+```c++
+struct CoffeeFactory:HotDrinkFactory
+{
+    unique_ptr<HotDrink> make() const override
+    {
+        return make_unique<Coffee>();
+    }
+}
+```
+
+TeaFactory的定义也与上面的CoffeeFactory相似。现在，假设我们想要定义更高层次的接口，用来制作不同类型的饮料，可以是热饮也可以是冷饮。我们可以创建一个名为DrinkFactory的工厂，它本身包含各种可用工厂的引用：
+
+```c++
+class DrinkFactory
+{
+    map<string, unique_ptr<HotDrinkFactory>> hot_factories;
+    DrinkFactory()
+    {
+        hot_factories["coffee"] = make_unique<CoffeeFactory>();
+        hot_factories["tea"] = make_unique<TeaFactory>();
+    }
+    unique_ptr<HotDrink> make_drink(const string &name)
+    {
+        auto drink = hot_factories[name]->make();
+        drink->prepare(200); // oops!
+        return drink;
+    }
+};
+```
+
+这里，我假设我们希望根据饮料的名称，不是某个整数或enum成员来制作饮料。我们只需创建字符串和相关工厂的映射(map):实际的工厂类型是HotDrinkFactory(我们的抽象工厂)，并通过智能指针而不是直接存储它们(这很有意义，因为我们希望防止对象切片)
+
+现在,如果你想喝一杯饮料时，你可以找到相关的工厂(想象一下咖啡店的店员走到正确的机器前)，生产饮料，准备好需要的量(我在前面设置了一个常数;你可以随意将其提升为一个参数)，就拿到了想要的饮料。嗯，就是这样。
+
+
+#### 函数工厂
+
+我想提的最后一件事情是：当我们使用工厂(factory)这个词的时候，我们通常指下面两种情况中的一种：
+
+- 一个知道如何创建对象的类
+- 一个被调用时会创建对象的函数
+
+第二种情况不仅仅是传统意义上的工厂方法。如果传递返回类型为T的std::function到某个函数中，这个被传递的函数通常被称为工厂，而不是工厂方法。这可能看起来有点奇怪，但如果考虑到方法与成员函数的含义是相同的，这样说会显得有意义点。
+
+幸运的是，函数可以存储在变量中，这意味着不只是存储指向工厂的指针(就像我们之前在DrinkFactory中做的那样)，我们可以把准备200毫升液体的过程内化到函数中。这是通过从工厂切换到简单的使用函数块来实现的，例如:
+
+```c++
+class DrinkWithVolumeFactory
+{
+    map<string, function<unique_ptr<HotDrink>()>> factories;
+    public:
+        DrinkWithVolumeFactory()
+        {
+            factories["tea"] = []{
+                auto tea = make_unique<Tea>();
+                tea->prepare(200);
+                return tea;
+            };
+             // 对应Coffee类也是类似的。
+        }
+}
+```
+
+当然，在采用了这种方法之后，我们现在只需要直接调用存储的工厂, 而不必在对象被构造出来之后再调用prepare方法。
+
+```c++
+inline unique_ptr<HotDrink>
+DrinkWithVolumeFactory::make_drink(const string &name)
+{
+    return factories[name];
+}
+```
+
+在使用方法上和以前是一样的。
+
+#### 总结
+
+让我们来回顾下这章涉及到的术语：
+
+- 工厂方法（factory method）是类的成员函数，可以作为创建对象的一种方式，通常用来替代构造函数。
+- 工厂（factory）通常是知道如何创建对象的独立的类，尽管如果你传递构造对象的函数(std::function，函数指针或者函数对象)到某个函数里面，这个参数通常也被称为工厂。
+- 抽象工厂（abstract factory），顾名思义，是一个抽象类，可以被生产一系列对象的具体类所继承。抽象工厂在实际中很少见。
+
+
+工厂相对于构造函数调用有下面几个关键的优势：
+
+- 工厂可以说“不”，这意味着除了选择返回一个对象外，它可以返回一个空指针(nullptr)。
+- 命名更有直观意义，且不受限，不像构造函数的函数名必须和类名相同。
+- 一个工厂能够生产出许多不同类型的对象
+- 工厂能够表现出多态行为，实例化一个类并通过基类的引用或指针返回实例化后的对象。
+- 工厂能够实现缓存(caching)和其他存储优化，他也是其他方法，例如池或单例模式（更多参见第5章内容）实现的自然的选择。
+
+工厂与建造者模式的不同之处在于，对于工厂，您通常一次性创建一个对象，而对于建造者，您通过部分地提供信息来分段地构造对象。

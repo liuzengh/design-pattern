@@ -10,7 +10,26 @@
 
 - [x] Chapter1: Introduction. 我直接使用了[@soyoo的翻译结果](https://github.com/soyoo/design_patterns_in_modern_cpp_zh_sample)
 - [ ] Chapter2: Builder.
-- [ ] Chapter3: Factories. 已经翻译了Scenario、Factory Method、Factory和Inner Factory.还剩下Abstract Factory 、 Functional Factory 和Summery。
+- [x] Chapter3: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
+
+## 第三章：工厂方法和工厂模式
+
+### 本章精要
+
+- 工厂方法（factory method）是类的成员函数，可以作为创建对象的一种方式，通常用来替代构造函数。
+- 工厂（factory）通常是知道如何创建对象的独立的类，尽管如果你传递构造对象的函数(std::function，函数指针或者函数对象)到某个函数里面，这个参数通常也被称为工厂。
+- 抽象工厂（abstract factory），顾名思义，是一个抽象类，可以被生产一系列对象的具体类所继承。抽象工厂在实际中很少见。
+
+
+工厂相对于构造函数调用有下面几个关键的优势：
+
+- 工厂可以说“不”，这意味着除了选择返回一个对象外，它可以返回一个空指针(nullptr)。
+- 命名更有直观意义，且不受限，不像构造函数的函数名必须和类名相同。
+- 一个工厂能够生产出许多不同类型的对象。
+- 工厂能够表现出多态行为，实例化一个类并通过基类的引用或指针返回实例化后的对象。
+- 工厂能够实现缓存(caching)和其他存储优化，他也是其他方法，例如池或单例模式（更多参见第5章内容）实现的自然的选择。
+
+工厂与建造者模式的不同之处在于，对于工厂，您通常一次性创建一个对象，而对于建造者，您通过部分地提供信息来分段地构造对象。
 
 ## 注意：
 
