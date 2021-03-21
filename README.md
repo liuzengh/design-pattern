@@ -12,7 +12,7 @@
 - [x] Chapter01: Introduction. 我直接使用了[@soyoo的翻译结果](https://github.com/soyoo/design_patterns_in_modern_cpp_zh_sample)
 - [ ] Chapter02: Builder.
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
-- [ ] Chapter09：Decorator. 场景、动态装饰器、静态装饰器和函数装饰器。
+- [ ] Chapter09：Decorator. 已经翻译场景、动态装饰器、静态装饰器。 函数装饰器。
 - [ ] Chapter20: Observer. 已翻译 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题和取消订阅与线程安全。
 
 ## 如何学习设计模式(即如何学习C++的面向对象思想)
