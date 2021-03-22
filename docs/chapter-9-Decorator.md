@@ -95,7 +95,7 @@ TransparentShape myCircle {ColoredShape{ Circle{23}, "green"}, 64 };
 
 ```
 
-### 静态装饰器
+#### 静态装饰器
 
 你是否注意到，在之前的讨论的场景中，我们给`Circle`提供了一个名为`resize()`的函数，不过它并不在`Shape`接口中。你可能已经猜到的，因为它不是`Shape`成员函数，所以不能从装饰器中调用它。
 
