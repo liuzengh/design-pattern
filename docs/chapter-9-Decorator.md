@@ -170,13 +170,149 @@ cout << sq.str() << endl;
 
 #### 函数装饰器
 
+虽然装饰器模式通常应用于类，但也同样可以应用于函数。假设你想在现有的代码中实现一个额外的功能: 你想记录一个函数被调用的情况，并在Excel中分析统计数据。当然，这可以通过在调用之前和之后添加一些代码来实现。
+
+```c++
+cout << "Entering function\n";
+// do the work
+cout << "Exiting funcion\n";
+```
+
+这工作得很好，但就关注点分离而言并不好:我们希望将日志记录功能存储在某个地方，以便我们可以重用它，并在必要时增强它。可以使用不同的方法来实现。一种方法是将整个工作单元作为`lambda`表达式提供给类似下面的日志组件：
+
+```c++
+struct Logger{
+  function<void()> func;
+  string name;
+  Logger(const function<void>& func, const string& name):
+    func{func},
+    name{name}
+    {
+      
+    }
+    void operator()()const
+    {
+      cout << "Entering" << name  << endl;
+      func();
+      cout << "Exiting" << name  << endl;
+    }
+};
+```
+
+使用这种方法，你可以编写以下内容:
+
+```c++
+Logger([]() {cout << "Hello" << endl; }, "HelloFunction")();
+\\ output:
+\\ Entering HelloFunction
+\\ Hello
+\\ Exiting HelloFunction
+```
+
+我们也可以将函数作为模板参数而不是`std::function`传入，这只需要在前面的代码中稍微改动下即可：
+
+```c++
+template <typename Func>
+struct Logger2{
+  Func func;
+  string name;
+  Logger2(const Func& func, const string& name):
+    func{func},
+    name{name}
+    {
+      
+    }
+    void operator()() const
+    {
+      cout << "Entering" << name  << endl;
+      func();
+      cout << "Exiting" << name  << endl;
+    }
+};
+```
+与之前用法完全相同， 我们可以创建一个实用函数来日志对象：
+
+```c++
+template <typename Func> auto make_logger2(Func func, const string& name)
+{
+  return Logger2<Func>{ func, name }; // () = call now
+}
+```
+
+然后像这样使用它:
+
+```c++
+auto call = make_logger2([]() {cout << "Hello!" << endl; }, "HelloFunction");
+call();
+```
+
+你可能会问这样做有什么意义呢？意义在于，我们现在有能力创建一个装饰器(其中包含被装饰的函数)并在我们选择的时候调用它。
+
+前面定义的`function<void()> func`没有函数参数和返回值，如果现在你想要实现带有返回值和函数参数的`add()`函数的调用(定义如下)，该怎么办:
+
+```c++
+double add(double a, double b)
+{
+  cout << a << "+" << b << "=" << (a + b) << endl;
+  return a + b;
+}
+```
+
+不是那么容易!但当然也不是不可能。让我们再实现一个`Logger`版本吧:
+
+```c++
+template <typename R, typename... Args>
+struct Logger3{
+  function<R(Args...)> func;
+  string name;
+
+  Logger3(const function<R(Args...)>& func, const string& name):
+    func{func},
+    name{name}
+    {
+      
+    }
+    R operator()(Args... args) const
+    {
+      cout << "Entering" << name  << endl;
+      R result = func(args...);
+      cout << "Exiting" << name  << endl;
+      return R;
+    }
+};
+```
+
+在前面，模板参数`R`指的是返回值的类型，而`Args`，你肯定已经猜到了。装饰器保留该函数并在必要时调用它，唯一的区别是`operator()`返回一个`R`，因此不会丢失返回值。我们可以构造另一个实用函数`make_function`
+
+```c++
+template <typename R, typename... Args> 
+auto make_logger3(R (*func)(Args...), const string& name)
+{
+  return Logger3<R(Args...)>{function<R(Args...)>(func),  name }; // () = call now
+}
+```
+
+注意，我没有使用`std::function`，而是将第一个参数定义为普通函数指针。我们现在可以使用这个函数来实例化带有日志记录的函数调用并使用它
+
+```c++
+auto logged_add = make_logger3(add, "Add");
+auto result = log_add(2, 3);
+```
+
+当然，可以用依赖注入（ Dependency Injection）代替`make_logger3`。这种方法的好处是：
+
+- 通过提供空的对象(`Null Object`)来动态打开和关闭日志记录，而不是实际的日志对象
+- 禁用被记录的代码的实际调用(同样，通过替换不同的日志对象)
+
+总之，这是开发人员工具箱中的另一个有用的工具。[FIXME:]我把这种方法放入到依赖项注入中留给读者作为练习。
+
 #### 总结
 
 在遵循开闭原则（OCP）的同时，装饰器为类提供了额外的功能。它的特点是可组合性:几个装饰器可以以任何顺序应用到一个对象上。我们已经研究了以下类型的装饰器：
 
 - **动态装饰器** 可以存储修饰对象的引用(甚至存储整个值，如果你想的话!)，并提供动态(运行时)可组合性，但代价是不能访问底层对象自己的成员。
 - **静态装饰器** 使用`mixin`继承(从模板参数继承)在编译时组合装饰器。这失去了任何类型的运行时灵活性(您不能重新组合对象)，但允许你访问底层对象的成员。这些对象也可以通过构造函数转发完全初始化。
-- **函数装饰器** 可以包装代码块或特定的函数，以允许行为的组合
+- **函数装饰器** 可以包装代码块或特定的函数，以允许 行为的组合
 
 
 值得一提的是，在不允许多重继承的语言中，装饰器也用于模拟多重继承，方法是聚合多个对象，然后提供一个接口，该接口是聚合对象的接口的集合并。
