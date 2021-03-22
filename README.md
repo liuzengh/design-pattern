@@ -1,4 +1,4 @@
-# [《Design Patterns In Modern C++》](https://book.douban.com/subject/30200080/) 的中文版翻译
+# Design Patterns In Modern C++ 中文版翻译
 
 ## 动机
 
@@ -245,4 +245,6 @@ Qt里面本身就用了很设计模式，从它的类里面继承一个子类，
 
 这本书的翻译应该是存在版权问题，但是出于学习的角度来说，如果没有很多人使用也不会有问题，至少在这个项目的初期应该不会引起其他的关注。
 
+## 参考
 
+ 1. [《Design Patterns In Modern C++》](https://book.douban.com/subject/30200080/)
