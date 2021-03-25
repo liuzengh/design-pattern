@@ -17,6 +17,7 @@
 - [ ] Chapter16: Iterator。
 - [ ] Chapter20: Observer. 已翻译 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题和取消订阅与线程安全。
 - [ ] Chapter22: Strategy. 翻译了动态策略。静态策略
+- [x] Chapter23: 模版方法模式和策略模式的异同。
 
 
 ### 第12章：代理的补充
