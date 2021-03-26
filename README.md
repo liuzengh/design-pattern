@@ -14,6 +14,8 @@
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
 - [x] Chapter06: Adapter. 额外补充了STL中queue的实现，提供了一个更安全和方法的Queue。需要了解boost库中的hash是怎么做的。
 - [x] Chapter09：Decorator. 涉及动态装饰器、静态装饰器 和 函数装饰器。
+- [x] Chapter10: Facade. 外观模式, 缓冲-视窗-控制台。
+- [ ] Chapter11: Flyweight. 享元模式。
 - [ ] Chapter12: Proxy。翻译了智能指针、属性代理、虚代理。通信代理。
 - [ ] Chapter16: Iterator。
 - [ ] Chapter20: Observer. 已翻译 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题和取消订阅与线程安全。
