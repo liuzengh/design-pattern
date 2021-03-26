@@ -12,6 +12,7 @@
 - [x] Chapter01: Introduction. 我直接使用了[@soyoo的翻译结果](https://github.com/soyoo/design_patterns_in_modern_cpp_zh_sample)
 - [ ] Chapter02: Builder.
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
+- [x] Chapter06: Adapter. 额外补充了STL中queue的实现，提供了一个更安全和方法的Queue。需要了解boost库中的hash是怎么做的。
 - [x] Chapter09：Decorator. 涉及动态装饰器、静态装饰器 和 函数装饰器。
 - [ ] Chapter12: Proxy。翻译了智能指针、属性代理、虚代理。通信代理。
 - [ ] Chapter16: Iterator。
@@ -19,39 +20,151 @@
 - [ ] Chapter22: Strategy. 翻译了动态策略。静态策略
 - [x] Chapter23: 模版方法模式和策略模式的异同。
 
+## 补充
 
-### 第12章：代理的补充
+我在原著的基础上补充和很多相关的东西，
 
-####  实现一个智能指针(考虑线程安全)
+- 第6章：适配器。探讨了STL中queue的适配器设计，提供了一个更方便和更安全的Queue适配器实现。
 
-1. 智能指针是线程安全的吗？
+## 第6章：适配器
 
-智能指针(shared_ptr)线程安全吗?（"half thread-safe"）
+### STL中queue适配器设计，提供了一个更方便和更安全的Queue
 
-是: 引用计数控制单元线程安全, 保证对象只被释放一次
-否: 对于数据的读写没有线程安全
+STL中`queue`是一个FIFO队列，提供的核心接口函数为
+
+- push( ) : 插入一个元素到队列中
+- front( ) : 返回队首元素
+- back( ) : 返回队尾元素
+- pop( ) : 移除队首元素
+
+
+我们可以看到在STL头文件`<queue>`中`queue`中定义：
+
+```c++
+namespace std
+{
+    template<typename T, typename Container = deque<T> >
+    class queue;
+}
+```
+
+注意到第二个可选参数，说明在`queue`中默认使用`deuqe`作为实际存储`T`类的容器, 当然也可以使用任何提供成员函数`front()`、`back()`、`push_back()`和`pop_front()`的序列容器类，如`list`。标准库中的`queue`的实现更注重效率而不是方便和安全。这并不是适合于所有场合。我们可以在一个提供`deque`容器做出修改，适配出一个不同于标准库但符合自己风格的`Queue`。
+
+下面实现的Queue提供了抛出异常的处理，以及返回队首元素的新的`pop`方法。
+
+```c++
+template <typename T,  Container = deque<T> >
+class Queue
+{
+    protected:
+        Container c;
+        
+        //异常类：在一个空队列中调用 pop() 和 front() 
+        class EmptyQueue : public exception
+        {
+            public:
+                virtual const char* what const throw( )
+                {
+                    return "empty queue!";
+                }
+            
+        }
+        
+        typename Container::size_type size( ) const
+        {
+            return c.size( );
+        }
+        
+        bool empty( ) bool 
+        {
+            return c.empty();
+        }
+
+        void push( const T& item )
+        {
+            c.push( item );
+        }
+        
+        void push( T&& item )
+        {
+            c.push( item );
+        }
+
+        const T& front( ) const
+        {
+            if( c.empty( ) )
+                throw EmptyQueue();
+            return c.front();
+        }
+        
+        T& front( )
+        {
+             if( c.empty( ) )
+                throw EmptyQueue( );
+            return c.front( );
+        }
+
+        const T& back( ) const
+        {
+            if( c.empty( ) )
+                throw EmptyQueue();
+            return c.back();
+        }
+        
+        T& front( )
+        {
+             if( c.empty( ) )
+                throw EmptyQueue( );
+            return c.back( );
+        }
+
+        T pop( ) const
+        {
+            if( c.empty() )
+                throw EmptyQueue();
+            
+            T elem( c.front( ) );
+            c.pop();
+            return elem;
+        }
+        
+};
+
+```
+
+##  第12章：代理
+
+### 实现一个智能指针(考虑线程安全)
+
+1. 智能指针(shared_ptr)线程安全吗?
+   
+- （"half thread-safe"）
+
+- 是: 引用计数控制单元线程安全, 保证对象只被释放一次
+
+- 否: 对于数据的读写没有线程安全
 
 2. 如何将智能指针变成线程安全?
 
-使用 mutex 控制智能指针的访问
-使用全局非成员原子操作函数访问, 诸如: std::atomic_load(), atomic_store(), …
-缺点: 容易出错, 忘记使用这些操作
-C++20: atomic<shared_ptr<T>>, atomic<weak_ptr<T>> std::atomic_shared_ptrand astd::atomic_weak_ptr.
-内部原理可能使用了 mutex
-全局非成员原子操作函数标记为不推荐使用(deprecated)
-总结：c++11对于shared_ptr
+- 使用 mutex 控制智能指针的访问
+- 使用全局非成员原子操作函数访问, 诸如: std::atomic_load(), atomic_store(), …
+- 缺点: 容易出错, 忘记使用这些操作
+- C++20: atomic<shared_ptr<T>>, atomic<weak_ptr<T>> std::atomic_shared_ptrand astd::atomic_weak_ptr.
+- 内部原理可能使用了 mutex
+- 全局非成员原子操作函数标记为不推荐使用(deprecated)
 
 3. 数据竞争
 
-一个shared_ptr对象实体可以被多个线程同时读取
-两个shared_ptr对象实体可以被两个线程同时写入，"析构"算写操作
-如果要从多个线程读写同一个shared_ptr,那么需要加锁。
+- 一个shared_ptr对象实体可以被多个线程同时读取
+- 两个shared_ptr对象实体可以被两个线程同时写入，"析构"算写操作
+- 如果要从多个线程读写同一个shared_ptr,那么需要加锁。
 
 4. 代码实现
 
-```c++
+```c++ 
 #include <atomic>
 
+// 非完全线程安全的。
 // 引用计数
 template<typename T>
 class ReferenceCounter
@@ -149,7 +262,7 @@ class SharedPtr{
 ```
 
 
-5.  重新回顾C++线程池中使用的虚代理方法
+5.  重新回顾C++线程池中使用的虚调用方法
 
 ### 如何学习设计模式(即如何学习C++的面向对象思想)
 
@@ -384,3 +497,5 @@ Qt里面本身就用了很设计模式，从它的类里面继承一个子类，
 ### 参考
 
  1. [《Design Patterns In Modern C++》](https://book.douban.com/subject/30200080/)
+ 2. [<<The C++ Standard Library - A Tutorial and Reference, 2nd Edition>>](http://cppstdlib.com/)
+   
