@@ -138,8 +138,60 @@ class Queue
 
 ```
 
-### 第7章-桥接：Pimpl编程技法
+### 第7章-桥接：Pimpl编程技法-减少编译依赖
 
+PImpl（Pointer to implementation）是一种C++编程技术，其通过将类的实现的详细信息放在另一个单独的类中，并通过不透明的指针来访问。这项技术能够将实现的细节从其对象中去除，还能减少编译依赖。有人将其称为“编译防火墙（Compilation Firewalls）”。
+#### Pimpl技法的定义和用处
+
+在C ++中，如果头文件类定义中的任何内容发生更改，则必须重新编译该类的所有用户-即使唯一的更改是该类用户甚至无法访问的私有类成员。这是因为C ++的构建模型基于文本包含（textual inclusion），并且因为C ++假定调用者知道一个类的两个主要方面，而这两个可能会受到私有成员的影响：
+
+- 因为类的私有数据成员参与其对象表示，影响大小和布局，
+- 也因为类的私有成员函数参与重载决议（这发生于成员访问检查之前），故对实现细节的任何更改都要求该类的所有用户重编译。
+
+为了减少这些编译依赖性，一种常见的技术是使用不透明的指针来隐藏一些实现细节。这是基本概念：
+
+```c++
+// Pimpl idiom - basic idea
+class widget {
+    // :::
+private:
+    struct impl;        // things to be hidden go here
+    impl* pimpl_;       // opaque pointer to forward-declared class
+};
+```
+
+类widget使用了handle/body编程技法的变体。handle/body主要用于对一个共享实现的引用计数，但是它也具有更一般的实现隐藏用法。为了方便起见，从现在开始，我将widget称为“可见类”，将impl称为“ Pimpl类”。
+
+编程技法的一大优势是，它打破了编译时的依赖性。首先，系统构建运行得更快，因为使用Pimpl可以消除额外的#include。我从事过一些项目，在这些项目中，仅将几个广为可见的类转换为使用Pimpls即可使系统的构建时间减少一半。其次，它可以本地化代码更改的构建影响，因为可以自由更改驻留在Pimpl中的类的各个部分，也就是可以自由添加或删除成员，而无需重新编译客户端代码。由于它非常擅长消除仅由于现在隐藏的成员的更改而导致的编译级联，因此通常被称为“编译防火墙”。
+
+#### Pimpl技法的实践
+
+避免使用原生指针和显式的delete。要仅使用C ++标准设施表达Pimpl，最合适的选择是通过unique_ptr来保存Pimpl对象，因为Pimpl对象唯一被可见类拥有。使用unique_ptr的代码很简单：
+
+```c++
+// in header file
+class widget {
+public:
+    widget();
+    ~widget();
+private:
+    class impl;
+    unique_ptr<impl> pimpl;
+};
+ 
+// in implementation file
+class widget::impl {
+    // :::
+};
+ 
+widget::widget() : pimpl{ new impl{ /*...*/ } } { }
+widget::~widget() { }                   // or =default
+
+```
+
+//TODO: handle/body编程技法
+
+#### 
 
 ### 第12章-代理：实现一个半线程安全的智能指针
 
