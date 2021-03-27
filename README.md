@@ -14,7 +14,7 @@
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
 - [ ] Chapter04: Prototype. 原型模式，对深拷贝的实现做了一些讨论。
 - [x] Chapter06: Adapter. 额外补充了STL中queue的实现，提供了一个更安全和方法的Queue。需要了解boost库中的hash是怎么做的。
-- [ ] Chapter07: Bridge. 
+- [x] Chapter07: Bridge. 增加了Pimpl编程技法的说明。
 - [x] Chapter09：Decorator. 涉及动态装饰器、静态装饰器 和 函数装饰器。
 - [x] Chapter10: Facade. 外观模式, 缓冲-视窗-控制台。
 - [x] Chapter11: Flyweight. 享元模式。Boost库中Flyweight的实现，以及Bimap
@@ -166,7 +166,7 @@ private:
 
 #### Pimpl技法的实践
 
-避免使用原生指针和显式的delete。要仅使用C ++标准设施表达Pimpl，最合适的选择是通过unique_ptr来保存Pimpl对象，因为Pimpl对象唯一被可见类拥有。使用unique_ptr的代码很简单：
+避免使用原生指针和显式的`delete`。要仅使用C++标准设施表达`Pimpl`，最合适的选择是通过`unique_ptr`来保存`Pimpl`对象，因为Pimpl对象唯一被可见类拥有。使用`unique_ptr`的代码很简单：
 
 ```c++
 // in header file
