@@ -1,6 +1,6 @@
 ### 享元模式
 
-享元(有时也称为token或cookie)是一种临时组件，相当于是对某个对象的智能引用。通常，享元适用于用于拥有大量非常相似的对象，并且希望最小化专用于存储所有这些值的内存量的情况。
+享元(有时也称为token或cookie)是一种临时组件，可以看作是对某个对象的智能引用。通常，享元适用于拥有大量非常相似的对象情况，并且希望最小化存储这些对象的内存量。
 
 让我们看一下与此模式相关的一些场景。
 
@@ -51,9 +51,9 @@ static key add( const string& s )
 }
 ```
 
-这是`get-or-add`机制的标准执行。如果您以前没有接触过`bimap`，您可能想要查阅`bimap`的文档，了解更多关于它如何工作的信息。
+这是`get-or-add`机制的标准执行。如果你以前没有接触过`bimap`，你可能想要查阅`bimap`的文档，了解更多关于它如何工作的信息。
 
-所以现在，如果我们想把姓和名给暴露出来(该成员对象位于保护段，类型是`key`，其实不是很有用!)，我们可以提供适当的`getter`和`setter`。
+如果我们想把姓和名给暴露出来(该成员对象位于保护段，类型是`key`，其实不是很有用!)，我们可以提供适当的`getter`和`setter`。
 
 ```c++
 const string& get_first_name() const
@@ -67,7 +67,7 @@ const string& get_last_name const
 }
 ```
 
-例如，要定义用户的流输出操作符，你可以简单地编写
+例如，要定义用户的`operator<<`，你可以简单地编写
 
 ```c++
 friend ostream& operator<<(ostream& os, const User& obj)
@@ -96,7 +96,7 @@ struct User2
         { }
 };
 ```
-您可以通过运行以下代码来验证它实际上是享元:
+你可以通过运行以下代码来验证它实际上是享元:
 
 ```c++
 User2 john_doe{ "John", "Doe" };
@@ -108,15 +108,15 @@ cout << boolalpha <<
 
 #### String Ranges
 
-如果你调用std::string::substring()，是否会返回一个全新构造的字符串?最后的结论是:如果你想操纵它，那当然，但是如果你想改变子字符串来影响原始对象呢?一些编程语言(例如Swift、Rust)显式地将子字符串作为范围返回，这同样是Flyweight模式的实现，它节省了所使用的内存量，此外还允许我们通过范围操作底层对象。
+如果你调用`std::string::substring()`，是否会返回一个全新构造的字符串?最后的结论是:如果你想操纵它，那当然，但是如果你想改变字串来修改原始对象呢?一些编程语言(例如`Swift、Rust`)显式地将子字符串作为范围返回，这同样是享元模式的实现，它节省了所使用的内存量，此外还允许我们通过指定区间(range)来操作底层对象。
 
-c++中与字符串范围等价的是string_view，数组还有其他的变体——只要避免复制数据就行!让我们试着构建我们自己的，非常琐碎的弦范围。
+c++中与字符串区间操作等价的是`string_view`，对于数组来说还有其他的变体——只要避免复制数据就行!让我们试着构建我们自己的，非常简单的字符串区间操作(`string range`)。
 
-让我们假设我们在一个类中存储了一堆文本，我们想获取该文本的一个范围并将其大写，有点像字处理器或IDE可能做的事情。我们可以只大写每个单独的字母并完成它，但是让我们假设我们想保持底层的纯文本在它的原始状态，并且只在我们使用流输出操作符时大写。
+让我们假设我们在一个类中存储了一堆文本，我们想获取该文本的某个区间的字符串并将其大写，有点像文字处理器或IDE可能做的事情。我们可以只大写每个单独的字母来实现，但是现在假设我们想保持底层的纯文本的原始状态，并且只在使用流输出操作符时才大写。
 
 #### 简单方法
 
-一种非常简单明了的方法是定义一个布尔数组，它的大小与纯文本字符串匹配，值指示是否要大写该字符。我们可以这样实现它:
+一种非常简单明了的方法是定义一个布尔数组，它的大小与纯文本字符串相等，布尔数组中的值指示是否要大写该字符。我们可以这样实现它:
 
 ```c++
 class FormattedText
@@ -173,8 +173,79 @@ cout << ft << endl;
 
 #### 享元实现
 
+让我们利用享元模式来实现一个`BetterFromattedText`类。我们将定义一个外部类和一个嵌套类，在嵌套类中实现享元。
+```c++
 
+class BetterFormattedText
+{
+    public:
+    struct TextRange
+        {
+        int start, end;
+        bool capitalize;
+        // other options here, e.g. bold, italic, etc.
+        bool covers(int position) const
+        {
+            return position >= start && position <= end;
+        }
+    };
+    private:
+        string plain_text;
+        vector<TextRange> formatting;
+};
 
+如您所见，`TextRange`只存储它所应用的起始点和结束点，以及我们是否希望将文本大写的实际格式信息，以及任何其他格式选项(粗体、斜体等)。它只有一个成员函数`covers()`，用来确定是否需要将此格式应用于给定位置的字符。
+
+`BetterFormattedText`用一个`vector`来存储·TextRange`的享元，并能够根据需要构建新的享元：
+
+```c++
+TextRange& get_range(int start, int end)
+ {
+    formatting.emplace_back(TextRange{ start, end });
+    return *formatting.rbegin();
+ }
+```
+
+上面的`get_range()`函数做了三件事：
+
+1. 构建一个新的`TextRange`对象
+2. 把构建的对象移动到`vector`中
+3. 返回`vector`中最有一个元素的引用
+
+在前面的实现中，我们没有检查重复的区间范围，如果是基于享元模式节约空间的精神的话也可以进一步加以改进。
+
+现在我们来实现`BetterFormattedText`中的`operator<<`：
+
+```c++
+friend std::ostream& operator<<(std::ostream& os,
+const BetterFormattedText& obj)
+{
+    string s;
+    for (size_t i = 0; i < obj.plain_text.length(); i++)
+    {
+        auto c = obj.plain_text[i];
+        for (const auto& rng : obj.formatting)
+        {
+            if (rng.covers(i) && rng.capitalize)
+            c = toupper(c);
+ 
+        }
+        s += c;
+    }
+    return os << s;
+ }
+```
+
+同样，我们所做的就是遍历每个字符并检查是否有覆盖它的范围。如果有，则应用范围指定的内容，在本例中就是大写。注意，这种设置允许范围自由重叠。
+
+现在，我们可以使用之前构造的所有东西来将这个单词大写，尽管API稍有不同，但更灵活:
+
+```c++
+BetterFormattedText bft("This is a brave new world");
+bft.get_range(10, 15).capitalize = true;
+cout << bft << endl;
+// prints "This is a BRAVE new world"
+```
 #### 总结
 
 享元模式是一种节约空间的技术。它存在许多确切的变体：

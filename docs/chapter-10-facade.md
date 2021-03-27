@@ -90,10 +90,10 @@ Console::Console(bool fullscreen, int char_width, int char_height,
 或者，也可以将所有这些参数打包到一个对象中，这个对象同样有一些合理的默认值。
 
 ```c++
- Console::Console(const ConsoleCreationParameters& ccp) { 
+ Console::Console(const ConsoleCreationParameters& ccp) 
+ { 
 
  }
-
 struct ConsoleCreationParameters
 {
     optional<Size> client_size;
