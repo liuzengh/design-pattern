@@ -20,7 +20,7 @@
 - [x] Chapter11: Flyweight. 享元模式。Boost库中Flyweight的实现，以及Bimap
 - [ ] Chapter12: Proxy。翻译了智能指针、属性代理、虚代理。通信代理。
 - [ ] Chapter16: Iterator。
-- [ ] Chapter19: Nulll Object. 涉及到对代理模式和pimpl编程技法的运用，以及std::optional
+- [x] Chapter19: Nulll Object. 涉及到对代理模式和pimpl编程技法的运用，以及std::optional
 - [ ] Chapter20: Observer. 已翻译 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题和取消订阅与线程安全。
 - [ ] Chapter22: Strategy. 翻译了动态策略。静态策略
 - [x] Chapter23: Template Method. 模版方法模式和策略模式的异同。
