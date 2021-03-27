@@ -20,6 +20,7 @@
 - [x] Chapter11: Flyweight. 享元模式。Boost库中Flyweight的实现，以及Bimap
 - [ ] Chapter12: Proxy。翻译了智能指针、属性代理、虚代理。通信代理。
 - [ ] Chapter16: Iterator。
+- [ ] Chapter19: Nulll Object. 涉及到对代理模式和pimpl编程技法的运用，以及std::optional
 - [ ] Chapter20: Observer. 已翻译 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题和取消订阅与线程安全。
 - [ ] Chapter22: Strategy. 翻译了动态策略。静态策略
 - [x] Chapter23: Template Method. 模版方法模式和策略模式的异同。
@@ -141,6 +142,7 @@ class Queue
 ### 第7章-桥接：Pimpl编程技法-减少编译依赖
 
 PImpl（Pointer to implementation）是一种C++编程技术，其通过将类的实现的详细信息放在另一个单独的类中，并通过不透明的指针来访问。这项技术能够将实现的细节从其对象中去除，还能减少编译依赖。有人将其称为“编译防火墙（Compilation Firewalls）”。
+
 #### Pimpl技法的定义和用处
 
 在C ++中，如果头文件类定义中的任何内容发生更改，则必须重新编译该类的所有用户-即使唯一的更改是该类用户甚至无法访问的私有类成员。这是因为C ++的构建模型基于文本包含（textual inclusion），并且因为C ++假定调用者知道一个类的两个主要方面，而这两个可能会受到私有成员的影响：
