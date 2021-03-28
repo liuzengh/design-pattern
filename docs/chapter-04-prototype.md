@@ -121,5 +121,5 @@ template <typename T> struct Cloneable
 }
 ```
 
-然后继续实现这个接口，并在需要实际副本时调用prototype.clone()。这实际上比复制构造函数/赋值更好地达到目的。
+然后继续实现这个接口，并在需要实际副本时调用prototype.clone()。这实际上比复制构造函数/赋值能更好地达到目的。
 
