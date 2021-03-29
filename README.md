@@ -1,5 +1,7 @@
 ## Design Patterns In Modern C++ 中文版翻译
 
+
+
 ### 动机
 
 1. 本书的示例是用C++11、14、17和更高版本的现代C++编写的，有助于熟悉现代C++的语法。
@@ -537,12 +539,19 @@ Qt里面本身就用了很设计模式，从它的类里面继承一个子类，
 
 面向对象注重的是代码的扩展和维护，而不是高性能，在一些需要高性能的场合，像我所在的游戏领域需要优化性能的地方，不能用面向对象，以后如果我找到合适的例子作为素材，我会再写一篇「面向对象的缺点」的文章。
 
-### 注意：
+### 声明
 
-这本书的翻译应该是存在版权问题，但是出于学习的角度来说，如果没有很多人使用也不会有问题，至少在这个项目的初期应该不会引起其他的关注。
+译者纯粹出于学习目的与个人兴趣翻译本书，不追求任何经济利益。
+
+本译文只供学习研究参考之用，不得公开传播发行或用于商业用途。有能力阅读英文书籍者请购买正版支持。
+
+### 许可
+
+[CC-BY 4.0](LICENSE)
+
 
 ### 参考
 
  1. [《Design Patterns In Modern C++》](https://book.douban.com/subject/30200080/)
- 2. [<<The C++ Standard Library - A Tutorial and Reference, 2nd Edition>>](http://cppstdlib.com/)
+ 2. [《The C++ Standard Library - A Tutorial and Reference, 2nd Edition》](http://cppstdlib.com/)
    
