@@ -2,9 +2,11 @@
 
 ### 动机
 
-1. 这本书本身是用Modern C++编写的，我是出于熟悉Modern C++的用法的目的来学习这本书的代码示例。
-2. 因为上过设计模式的课，虽然绝大部分都忘了，但是很容易捡起来，看起来也很熟悉，英文原版我大致浏览了下也不复杂，内容上我应该能hold住。
-3. 在比较嘈杂或短的空闲时间也可以翻译，翻译这件事总是有一点点进度的，而且有时候看其他东西或写代码累了来搞下翻译还是可以的。
+1. 本书的示例是用C++11、14、17和更高版本的现代C++编写的，有助于熟悉现代C++的语法。
+2. 设计模式是编程经验的总结，广泛存在于工程实践中，牵扯出非常多的相关内容（比大家熟悉的单例模式为例，可以引出C++11后的多线程内存模型，除了用局部静态变量还可以用Acquire and Release栅栏， Sequentially Consistent 原子操作等无锁方式实现，以及folly中如何在工业实践中实现Singleton来管理多个Singletons），以此为线索梳理所学的知识。
+3. 打算在原书的基础上补充大量的相关知识，如STL、Boost和folly中的设计模式，举例Leetcode题目中的设计模式，还有融入多线程并发情况下的一些例子。
+
+
 
 
 ### TODO
@@ -24,6 +26,7 @@
 - [ ] Chapter16: Iterator。
 - [x] Chapter19: Nulll Object. 涉及到对代理模式和pimpl编程技法的运用，以及std::optional
 - [ ] Chapter20: Observer. 已翻译 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题和取消订阅与线程安全。
+- [] Chapter21: State.  补充字符串匹配、例子
 - [ ] Chapter22: Strategy. 翻译了动态策略。静态策略
 - [x] Chapter23: Template Method. 模版方法模式和策略模式的异同。
 - [x] Chapter24: Visitor. 入侵式、反射式、经典式的访问者的设计思路，std::visitor在variant类型上的访问。
