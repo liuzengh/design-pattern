@@ -204,7 +204,7 @@ Coach类的实现是微不足道的;我们的教练连名字都不知道。但�
 注意lambda的参数类型是EventData*——我们不知道一个球员是否已经得分或已经被发送，所以我们需要dynamic_cast(或类似的机制)来确定我们得到了正确的类型。
 
 有趣的是，所有神奇的事情都发生在设置阶段:不需要明确地为特定信号征募插槽。客户端可以自由地使用它们的构造函数创建对象，然后，当玩家得分时，通知被发送:
-```
+```c++
 Game game;
 Player player{ "Sam", game };
 Coach coach{ game };
@@ -213,9 +213,9 @@ player.score();
 player.score(); // ignored by coach
 ```
 这将产生以下输出:
+```c++
+coach says: well done, Sam
+coach says: well done, Sam
 ```
-coach says: well done, Sam
-coach says: well done, Sam
-
 
 
