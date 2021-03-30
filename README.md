@@ -28,6 +28,7 @@
 - [x] Chapter15: Interpreter.涉及编译原理里面的词法分析，语法分析，`Boost.spirit`的使用。后面会补充LeetCode上实现计算器的几道题目和正则表达式的题目，也许会增加`Lex/Yacc`工具的使用介绍，以及tinySQL解释器实现的简单解释。
 - [ ] Chapter16: Iterator.
 - [ ] Chapter17: Mediator.
+- [x] Chapter18: Memento.
 - [x] Chapter19: Nulll Object. 涉及到对代理模式和pimpl编程技法的运用，以及std::optional
 - [ ] Chapter20: Observer. 已翻译 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题和取消订阅与线程安全。
 - [x] Chapter21: State.  补充字符串匹配、例子
