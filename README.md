@@ -20,12 +20,13 @@
 - [ ] Chapter05: Singleton. 缺少控制反转和Monostate
 - [x] Chapter06: Adapter. 额外补充了STL中queue的实现，提供了一个更安全和方法的Queue。需要了解boost库中的hash是怎么做的。
 - [x] Chapter07: Bridge. 增加了Pimpl编程技法的说明。
-- [ ] Chapter08: Composite. 
+- [x] Chapter08: Composite. 
 - [x] Chapter09：Decorator. 涉及动态装饰器、静态装饰器 和 函数装饰器。
 - [x] Chapter10: Facade. 外观模式, 缓冲-视窗-控制台。
 - [x] Chapter11: Flyweight. 享元模式。Boost库中Flyweight的实现，以及Bimap
 - [ ] Chapter12: Proxy. 翻译了智能指针、属性代理、虚代理。通信代理。 
-- [ ] Chapter13: Chain of Responsibility. 指针链；代理链涉及中介模式和观察者模式。
+- [x] Chapter13: Chain of Responsibility. 指针链；代理链涉及中介模式和观察者模式。
+- [x] Chapter14: Command.
 - [x] Chapter15: Interpreter.涉及编译原理里面的词法分析，语法分析，`Boost.spirit`的使用。后面会补充LeetCode上实现计算器的几道题目和正则表达式的题目，也许会增加`Lex/Yacc`工具的使用介绍，以及tinySQL解释器实现的简单解释。
 - [x] Chapter16: Iterator. STL库中的迭代器，涉及二叉树的迭代器，使用协程来简化迭代过程。
 - [ ] Chapter17: Mediator.
