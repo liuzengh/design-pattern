@@ -17,7 +17,7 @@
 - [ ] Chapter02: Builder. 待翻译组合建造者这一节。
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
 - [ ] Chapter04: Prototype. 原型模式，对深拷贝的实现做了一些讨论。
-- [ ] Chapter05: Singleton. 缺少控制反转和Monostate
+- [ ] Chapter05: Singleton. 缺少控制反转和Monostate.
 - [x] Chapter06: Adapter. 额外补充了STL中queue的实现，提供了一个更安全和方法的Queue。需要了解boost库中的hash是怎么做的。
 - [x] Chapter07: Bridge. 增加了Pimpl编程技法的说明。
 - [x] Chapter08: Composite. 
@@ -40,12 +40,46 @@
 ## 补充
 
 在原著的基础上补充了很多相关的东西，
-
+- 第5章-单例：补充了无锁的double-check实现。
 - 第6章-适配器：探讨了STL中queue的适配器设计，提供了一个更方便和更安全的`Queue`适配器实现。
 - 第7章-桥接：对C++中的Pimpl编程技法进行了补充，给出了在编译器方面的应用。
 - 第12章-代理：讨论C++中智能指针的实现，给出一个半线程安全的智能指针`shared_ptr`的实现。
 - 第20章-观察者：补充了由观察者模式衍生出来的发布-订阅模式，总结了消息队列使用注意事项，提供了2种用redis来实现消息队列的解决方案。
 
+### 第5章-单例：无锁的double-check实现
+
+```c++
+class Singleton
+{
+    protected:
+        Singleton();
+    private:
+        static std::mutex m_mutex;
+        static std::atomic<Singleton*> m_instance = nullptr;
+    public:
+        static Singleton* Singleton::getInstance() 
+        {
+            Singleton* tmp = m_instance.load(std::memory_order_acquire);
+            if (tmp == nullptr) 
+            {
+                //std::scoped_lock(m_mutex);
+                std::lock_guard<std::mutex> lock(m_mutex);
+                tmp = m_instance.load(std::memory_order_relaxed);
+                if (tmp == nullptr) 
+                {
+                    tmp = new Singleton;
+                    m_instance.store(tmp, std::memory_order_release);
+                }
+            }
+            return tmp;
+        }
+        Singleton(const Singleton&) = delete;
+        Singleton& operator=(const Singleton&) = delete;
+        Singleton(Singleton&&) = delete;
+        Singleton& operator=(Singleton&&) = delete;
+
+};
+```
 ###  第6章-适配器：设计更安全方便的Queue
 
 STL中`queue`是一个FIFO队列，提供的核心接口函数为
