@@ -9,7 +9,7 @@
 ### TODO
 
 - [x] Chapter01: Introduction. 我直接使用了[@soyoo的翻译结果](https://github.com/soyoo/design_patterns_in_modern_cpp_zh_sample)
-- [x] Chapter02: Builder. 待翻译组合建造者这一节。
+- [x] Chapter02: Builder。
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
 - [x] Chapter04: Prototype. 原型模式，对深拷贝的实现做了一些讨论(拷贝构造函数和拷贝复制运算符；序列化和反序列化)。
 - [x] Chapter05: Singleton. 线程安全，单例的问题，控制反转和Monostate.
