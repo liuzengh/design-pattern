@@ -1,23 +1,18 @@
 ## Design Patterns In Modern C++ 中文版翻译
 
-
-
 ### 动机
 
 1. 本书的示例是用C++11、14、17和更高版本的现代C++编写的，有助于熟悉现代C++的语法。
 2. 设计模式是编程经验的总结，广泛存在于工程实践中，牵扯出非常多的相关内容（比大家熟悉的单例模式为例，可以引出C++11后的多线程内存模型，除了用局部静态变量还可以用Acquire and Release栅栏， Sequentially Consistent 原子操作等无锁方式实现，以及folly中如何在工业实践中实现Singleton来管理多个Singletons），以此为线索梳理所学的知识。
 3. 打算在原书的基础上补充大量的相关知识，如STL、Boost和folly中的设计模式，举例Leetcode题目中的设计模式，还有融入多线程并发情况下的一些例子。
 
-
-
-
 ### TODO
 
 - [x] Chapter01: Introduction. 我直接使用了[@soyoo的翻译结果](https://github.com/soyoo/design_patterns_in_modern_cpp_zh_sample)
-- [ ] Chapter02: Builder. 待翻译组合建造者这一节。
+- [x] Chapter02: Builder. 待翻译组合建造者这一节。
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
 - [x] Chapter04: Prototype. 原型模式，对深拷贝的实现做了一些讨论(拷贝构造函数和拷贝复制运算符；序列化和反序列化)。
-- [ ] Chapter05: Singleton. 缺少控制反转和Monostate.
+- [x] Chapter05: Singleton. 线程安全，单例的问题，控制反转和Monostate.
 - [x] Chapter06: Adapter. 额外补充了STL中queue的实现，提供了一个更安全和方法的Queue。需要了解boost库中的hash是怎么做的。
 - [x] Chapter07: Bridge. 增加了Pimpl编程技法的说明。
 - [x] Chapter08: Composite. 
@@ -29,7 +24,7 @@
 - [x] Chapter14: Command.
 - [x] Chapter15: Interpreter.涉及编译原理里面的词法分析，语法分析，`Boost.spirit`的使用。后面会补充LeetCode上实现计算器的几道题目和正则表达式的题目，也许会增加`Lex/Yacc`工具的使用介绍，以及tinySQL解释器实现的简单解释。
 - [x] Chapter16: Iterator. STL库中的迭代器，涉及二叉树的迭代器，使用协程来简化迭代过程。
-- [ ] Chapter17: Mediator.
+- [x] Chapter17: Mediator.
 - [x] Chapter18: Memento.
 - [x] Chapter19: Nulll Object. 涉及到对代理模式和pimpl编程技法的运用，以及std::optional
 - [x] Chapter20: Observer. 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题, 取消订阅与线程安全 和使用Boost.Signals2 来实现 Observer。
