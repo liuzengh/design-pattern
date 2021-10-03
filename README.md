@@ -34,9 +34,10 @@
 - [x] Chapter19: Nulll Object. 涉及到对代理模式和pimpl编程技法的运用，以及std::optional
 - [x] Chapter20: Observer. 属性观察者、模板观察者Observer\<T>、可观察Observable\<T> 、依赖问题, 取消订阅与线程安全 和使用Boost.Signals2 来实现 Observer。
 - [x] Chapter21: State.  补充字符串匹配、例子
-- [ ] Chapter22: Strategy. 翻译了动态策略。静态策略
+- [x] Chapter22: Strategy. 动态策略和静态策略
 - [x] Chapter23: Template Method. 模版方法模式和策略模式的异同。
 - [x] Chapter24: Visitor. 入侵式、反射式、经典式的访问者的设计思路，std::visitor在variant类型上的访问。
+
 ## 补充
 
 在原著的基础上补充了很多相关的东西，

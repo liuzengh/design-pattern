@@ -17,41 +17,36 @@
 因此，我们的目标是打印一个markdown或html格式的简单的文本项列表：
 
 ```c++
-enum class OutputFormat 
-{
-    markdown,
-    html
-};
+enum class OutputFormat { markdown, html };
 ```
 
 我们可以在基类ListStrategy中定义打印策略框架：
 
 ```c++
-struct ListStrategy 
-{
-    virtual void start(ostringstream& oss) { };
-    virtual void end(ostringstream& oss) { };
-    virtual void add_list_item(ostringstream& oss, const string& item) {};
+struct ListStrategy {
+  virtual void start(ostringstream& oss){};
+  virtual void end(ostringstream& oss){};
+  virtual void add_list_item(ostringstream& oss, const string& item){};
 };
 ```
 
 现在让我们跳到文本处理组件。这个组件将调用打印列表的成员函数， `append_list()`
 
 ```c++
-struct TextProcessor 
-{
-    void append_list(const verctor<string> items)
-    {
-        listStrategy->start(oss);
+struct TextProcessor {
+  void append_list(const verctor<string> items) {
+    listStrategy->start(oss);
 
-        for(auto &&item : items)
-            listStrategy->add_list_item(oss, item)
+    for (auto &&item : items)
+      listStrategy
+          ->add_list_item(oss, item)
 
-        listStrategy->end(oss);
-    }
-    private:
-        ostringstream oss;
-        unique_ptr<ListStrategy> listStrategy;
+              listStrategy->end(oss);
+  }
+
+ private:
+  ostringstream oss;
+  unique_ptr<ListStrategy> listStrategy;
 };
 ```
 
@@ -61,36 +56,22 @@ struct TextProcessor
 现在我们可以继续为列表实现不同的打印策略，比如`HtmlListStrategy`
 
 ```c++
-struct HtmlListStrategy : ListStrategy 
-{
-    void start(ostringstream& oss) override
-    {
-        oss << "<ul>\n";
-    }
+struct HtmlListStrategy : ListStrategy {
+  void start(ostringstream& oss) override { oss << "<ul>\n"; }
 
-    void end(ostringstream& oss) override
-    {
-        oss << "</ul>\n";
-    }
+  void end(ostringstream& oss) override { oss << "</ul>\n"; }
 
-    void add_list_item(ostringstream& oss, const string& item) override
-    {
-        oss << "<li>" << item << "</li> \n"
-    }
-
-
-}; 
+  void add_list_item(ostringstream& oss, const string& item) override {
+    oss << "<li>" << item << "</li> \n"
+  }
+};
 ```
 
 我们可以用类似的方式实现`MarkdownListStrategy`，但是因为Markdown不需要开始/结束标记，所以我们将只覆盖`add_list_item()`函数。
 
 ```c++
-struct MarkdownListStrategy : ListStrategy
-{
-    void add_list_item(ostringstream& oss) override 
-    {
-        oss << "*" << item;
-    }
+struct MarkdownListStrategy : ListStrategy {
+  void add_list_item(ostringstream& oss) override { oss << "*" << item; }
 };
 ```
 
@@ -113,18 +94,15 @@ cout << tp.str() << endl;
 我们可以为在运行时可切换的策略做准备，这正是我们称之为动态策略的原因。这是在`set_output_format()`函数中完成的，它的实现很简单
 
 ```c++
- void set_output_format(OutputFormat format)
-    {
-        switch(format)
-        {
-            case OutputFormat::markdown:
-                list_strategy = make_unique<MarkdownListStrategy>();
-            case OutputFormat::html:
-                list_strategy = make_unique<HtmlListStrategy>();
-            break;
-
-        }
-    }
+void set_output_format(OutputFormat format) {
+  switch (format) {
+    case OutputFormat::markdown:
+      list_strategy = make_unique<MarkdownListStrategy>();
+    case OutputFormat::html:
+      list_strategy = make_unique<HtmlListStrategy>();
+      break;
+  }
+}
 ```
 
 现在，从一种策略切换到另一种策略是很简单的，你可以直接看到结果:
@@ -144,3 +122,48 @@ cout << tp.str() << endl;
 ```
 
 #### 静态策略
+
+多亏了模板的魔力，你可以将任何策略直接融入到类型中。只需对 `TextStrategy` 类进行最少的更改：
+
+```c++
+template <typename LS>
+struct TextProcessor {
+  void append_list(const vector<string> items) {
+    list_strategy.start(oss);
+    for (auto& item : items) list_strategy.add_list_item(oss, item);
+    list_strategy.end(oss);
+  }
+  // other functions unchanged
+ private:
+  ostringstream oss;
+  LS list_strategy;
+};
+```
+
+我们只是添加了 `LS` 模板参数，使用这种类型创建了一个成员策略，并开始使用它而不是我们之前使用的指针。 `append_list()` 的结果是相同的：
+
+```c++
+// markdown
+TextProcessor<MarkdownListStrategy> tpm;
+tpm.append_list({"foo", "bar", "baz"});
+cout << tpm.str() << endl;
+// html
+TextProcessor<HtmlListStrategy> tph;
+tph.append_list({"foo", "bar", "baz"});
+cout << tph.str() << endl;
+```
+
+前面示例的输出与动态策略的输出相同。请注意，我们必须创建两个 `textProcessor` 实例，每个实例都有不同的列表处理策略。
+
+#### 总结
+
+策略设计模式允许你定义算法的框架，然后使用组合来提供与特定策略相关的缺失实现细节。这种方法存在于两种实现方式：
+
+- *动态策略* 只是保持一个指向正在使用的策略的指针/引用。想换一种不同的策略吗？只需更改引用。简单！
+
+- *静态策略* 要求您在编译时选择策略并坚持下去 - 以后没有改变主意的余地
+
+应该使用动态策略还是静态策略？好吧，动态对象允许你在构造对象后重新配置对象。想象一个控制文本输出形式的 UI 设置：你更愿意拥有一个可切换的 `TextProcessor` 还是两个 `TextProcessor<MarkdownStrategy>` 和 `TextProcessor<HtmlStrategy>` 类型的变量？这真的取决于你。
+
+最后一点，你可以限制类型采用的策略集：而不是允许通用 `ListStrategy` 参数，可以采用 `std::variant` 列出允许传入的类型。
+
