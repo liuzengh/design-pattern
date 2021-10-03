@@ -16,7 +16,7 @@
 - [x] Chapter01: Introduction. 我直接使用了[@soyoo的翻译结果](https://github.com/soyoo/design_patterns_in_modern_cpp_zh_sample)
 - [ ] Chapter02: Builder. 待翻译组合建造者这一节。
 - [x] Chapter03: Factories. 涉及工厂方法、工厂、内部工厂、抽象工厂和函数工厂。
-- [ ] Chapter04: Prototype. 原型模式，对深拷贝的实现做了一些讨论。
+- [x] Chapter04: Prototype. 原型模式，对深拷贝的实现做了一些讨论(拷贝构造函数和拷贝复制运算符；序列化和反序列化)。
 - [ ] Chapter05: Singleton. 缺少控制反转和Monostate.
 - [x] Chapter06: Adapter. 额外补充了STL中queue的实现，提供了一个更安全和方法的Queue。需要了解boost库中的hash是怎么做的。
 - [x] Chapter07: Bridge. 增加了Pimpl编程技法的说明。
